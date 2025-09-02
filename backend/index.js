@@ -1,6 +1,6 @@
 
 
-const { Message, Keypair, PublicKey } = require('@solana/web3.js');
+const { Message, Keypair, PublicKey, Transaction,Connection} = require('@solana/web3.js');
 const express=require('express');
 const { userModel } = require('./models');
 const app=express();
@@ -9,6 +9,7 @@ const jwt=require('jsonwebtoken');
 app.use(express.json());
 const Jwt_secret="12345"
 
+const connection=new Connection("https://solana-mainnet.g.alchemy.com/v2/7IU3f_LLvijCmd9o-YePsbarS1WE2M86")
 
 app.post("api/v1/signup",async(req,res)=>{
     const username=req.body.username;
@@ -62,7 +63,18 @@ app.post("api/v1/sign in", async(req,res)=>{
     })
 })
 
-app.post("api/v1/txn/sign",(req,res)=>{
+
+
+
+ 
+app.post("api/v1/txn/sign",async (req,res)=>{
+
+    const serializedTransaction=req.body.message;
+    const tx=Transaction.from(serializedTransaction);
+    const keypair=new Keypair();
+    tx.sign(keypair);
+    await connection.sendTransaction(tx);
+
     res.json({
         Message:"sign up"
     })
